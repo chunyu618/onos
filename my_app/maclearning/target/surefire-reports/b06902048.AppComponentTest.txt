@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: b06902048.AppComponentTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.265 s - in b06902048.AppComponentTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.26 s - in b06902048.AppComponentTest
