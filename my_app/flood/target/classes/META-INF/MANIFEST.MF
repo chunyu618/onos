@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1582644479490
+Build-Jdk: 1.8.0_212
+Built-By: onostest
+Bundle-Description: ONOS OSGi bundle archetype
+Bundle-ManifestVersion: 2
+Bundle-Name: flood
+Bundle-SymbolicName: b06902048.flood
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: b06902048;uses:="org.onosproject.cfg,org.onosproject.cor
+ e,org.onosproject.net.flow,org.onosproject.net.flowobjective,org.onospr
+ oject.net.packet,org.onosproject.net.topology";version="1.0.0"
+Import-Package: org.onlab.packet;version="[2.0,3)",org.onosproject.cfg;v
+ ersion="[2.0,3)",org.onosproject.core;version="[2.0,3)",org.onosproject
+ .net;version="[2.0,3)",org.onosproject.net.flow;version="[2.0,3)",org.o
+ nosproject.net.flowobjective;version="[2.0,3)",org.onosproject.net.pack
+ et;version="[2.0,3)",org.onosproject.net.topology;version="[2.0,3)",org
+ .slf4j;version="[1.7,2)"
+Require-Capability: osgi.extender;filter:="(&(osgi.extender=osgi.compone
+ nt)(version>=1.3.0)(!(version>=2.0.0)))",osgi.service;filter:="(objectC
+ lass=org.onosproject.cfg.ComponentConfigService)";effective:=active,osg
+ i.service;filter:="(objectClass=org.onosproject.core.CoreService)";effe
+ ctive:=active,osgi.service;filter:="(objectClass=org.onosproject.net.fl
+ ow.FlowRuleService)";effective:=active,osgi.service;filter:="(objectCla
+ ss=org.onosproject.net.flowobjective.FlowObjectiveService)";effective:=
+ active,osgi.service;filter:="(objectClass=org.onosproject.net.packet.Pa
+ cketService)";effective:=active,osgi.service;filter:="(objectClass=org.
+ onosproject.net.topology.TopologyService)";effective:=active,osgi.ee;fi
+ lter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Service-Component: OSGI-INF/b06902048.AppComponent.xml
+Tool: Bnd-3.5.0.201709291849
