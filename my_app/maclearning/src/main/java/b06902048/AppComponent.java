@@ -119,38 +119,37 @@ public class AppComponent {
 	private class ReactivePacketProcessor implements PacketProcessor{
 		@Override
 		public void process(PacketContext context){
+			//To check whether this packet was handled.
 			if(context.isHandled())	{
 				return;
 			}
+			
 			InboundPacket pkt = context.inPacket();
+			//parse this packet as Ethernet packet
 			Ethernet ethPkt = pkt.parsed();
+			//add this device to table if absent
 			macTables.putIfAbsent(pkt.receivedFrom().deviceId(), Maps.newConcurrentMap());
-
+			
+			//what is this???
 			if(ethPkt == null){
 				return;
 			}
 
-			if (ethPkt.getEtherType() == Ethernet.TYPE_IPV4) 
-				log.info("[IPv4] DeviceID {} from {} to {}", 
-						pkt.receivedFrom().toString(), 
-						ethPkt.getSourceMAC(),
-						ethPkt.getDestinationMAC());
+			ConnectPoint DeviceID = pkt.receivedFrom();
+			MacAddress srcMAC = ethPkt.getSourceMAC();
+			MacAddress dstMAC = ethPkt.getDestinationMAC();
+			//two type of packet : IPv4 and ARP
+			if (ethPkt.getEtherType() == Ethernet.TYPE_IPV4){
+				log.info("[IPv4] DeviceID {} from {} to {}", DeviceID, srcMAC, dstMAC);
+			}
 			else if (ethPkt.getEtherType() == Ethernet.TYPE_ARP){
 				ARP p = (ARP) ethPkt.getPayload();
-				log.info("[ARP]{}  DeviceID {} from {} to {}",
-						(p.getOpCode() == ARP.OP_REPLY)? "[REPLY]": "[REQUEST]",
-						pkt.receivedFrom().toString(), 
-						ethPkt.getSourceMAC(),
-						ethPkt.getDestinationMAC());
+				String type = (p.getOpCode() == ARP.OP_REPLY)? "[REPLY]": "[REQUEST]";
+				log.info("[ARP]{}  DeviceID {} from {} to {}", type, DeviceID, srcMAC, dstMAC);
 			}
 			else return;
 
-			HostId srcId = HostId.hostId(ethPkt.getSourceMAC());
-			HostId dstId = HostId.hostId(ethPkt.getDestinationMAC());
-			log.info("[Packet] Device ID {} port {}, from {} to {}", pkt.receivedFrom().deviceId(), pkt.receivedFrom().port(), srcId, dstId);
-			
 			learning(context);
-
 			forwarding(context);
 
 		}
