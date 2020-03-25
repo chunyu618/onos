@@ -135,17 +135,18 @@ public class AppComponent {
 				return;
 			}
 
-			ConnectPoint DeviceID = pkt.receivedFrom();
+			ConnectPoint deviceID = pkt.receivedFrom();
+			String deviceIDString = deviceID.toString();
 			MacAddress srcMAC = ethPkt.getSourceMAC();
 			MacAddress dstMAC = ethPkt.getDestinationMAC();
 			//two type of packet : IPv4 and ARP
 			if (ethPkt.getEtherType() == Ethernet.TYPE_IPV4){
-				log.info("[IPv4] DeviceID {} from {} to {}", DeviceID, srcMAC, dstMAC);
+				log.info("[IPv4] DeviceID {} from {} to {}", deviceIDString, srcMAC, dstMAC);
 			}
 			else if (ethPkt.getEtherType() == Ethernet.TYPE_ARP){
 				ARP p = (ARP) ethPkt.getPayload();
 				String type = (p.getOpCode() == ARP.OP_REPLY)? "[REPLY]": "[REQUEST]";
-				log.info("[ARP]{}  DeviceID {} from {} to {}", type, DeviceID, srcMAC, dstMAC);
+				log.info("[ARP]{}  DeviceID {} from {} to {}", type, deviceIDString, srcMAC, dstMAC);
 			}
 			else return;
 
