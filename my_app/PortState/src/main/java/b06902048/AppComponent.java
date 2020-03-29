@@ -54,7 +54,7 @@ public class AppComponent {
     /** Some configurable property. */
     // private String someProperty;
     private ApplicationId appId;
-    private Map<ConnectPoint,portStatsReaderTask> map = new HashMap<ConnectPoint,portStatsReaderTask>();
+    private Map<Device,portStatsReaderTask> map = new HashMap<Device,portStatsReaderTask>();
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     protected ComponentConfigService cfgService;
@@ -101,27 +101,20 @@ public class AppComponent {
                     log.warn("    Unable to read portDeltaStats");
             }
             
-            // this list doesn't contain LOCAL port of device
-            List<PortStatistics> portStatisticsList = deviceService.getPortDeltaStatistics(d.id());
-            for (PortStatistics portStats : portStatisticsList) {
-                try {
-                    PortNumber port = portStats.portNumber();
-                    ConnectPoint cp = new ConnectPoint(d.id(), port);
-                    portStatsReaderTask task = new portStatsReaderTask();
-                    task.setDelay(3);
-                    task.setExit(false);
-                    task.setLog(log);
-                    task.setPort(port);
-                    task.setDeviceService(deviceService);
-                    task.setDevice(d);
-                    map.put(cp, task);
-                    log.info("[Start] polling {} {}", task.getDevice().id(), task.getPort());
-                    task.schedule();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.error("exception!");
-                }
-            }
+			try {
+				portStatsReaderTask task = new portStatsReaderTask();
+				task.setDelay(3);
+				task.setExit(false);
+				task.setLog(log);
+				task.setDeviceService(deviceService);
+				task.setDevice(d);
+				map.put(d, task);
+				log.info("[Start] polling {} {}", task.getDevice().id());
+				task.schedule();
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error("exception!");
+			}
         }
     }
 
@@ -129,7 +122,7 @@ public class AppComponent {
     protected void deactivate() {
         cfgService.unregisterProperties(getClass(), false);
         for(portStatsReaderTask task : map.values()) {
-            log.info("[Stop] polling {} {}", task.getDevice().id(), task.getPort());
+            log.info("[Stop] polling {} {}", task.getDevice().id());
             task.setExit(true);
             task.getTimer().cancel();
         }

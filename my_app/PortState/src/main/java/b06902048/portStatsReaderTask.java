@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.List;
 
 public class portStatsReaderTask {
 
@@ -23,7 +24,6 @@ public class portStatsReaderTask {
     private Logger log;
     private Device device;
     private boolean exit;
-    private PortNumber port;
     private PortStatistics portStats;
     protected DeviceService deviceService = AbstractShellCommand.get(DeviceService.class);
 	protected FlowRuleService flowRuleService = AbstractShellCommand.get(FlowRuleService.class);
@@ -40,18 +40,24 @@ public class portStatsReaderTask {
 
         @Override
         public void run() {
-			log.info("running");
-            while (!isExit()) {           
-                log.info("[DeviceID] {}", getDevice().id());
-                PortStatistics portstat = deviceService.getStatisticsForPort(getDevice().id(), getPort());
-                log.info("Port {} Received {} bytes",   port, portstat.bytesReceived());
-                log.info("Port {} Received {} packets", port, portstat.packetsReceived());
+            while (!isExit()) {  
+                log.info("	[DeviceID] {}", getDevice().id());
+				
+				log.info("	--------------------");
+				
+				List<PortStatistics> portStatisticsList = deviceService.getPortStatistics(getDevice().id());
+				for(PortStatistics portStat : portStatisticsList){
+					PortNumber port = portStat.portNumber();
+	                log.info("	Port {}	received {} packets, {} bytes",   port, portStat.packetsReceived(), portStat.bytesReceived());
+				}
+
+				log.info("	--------------------");
+				
 				Iterable<FlowEntry> flows = flowRuleService.getFlowEntries(getDevice().id());
 				for(FlowEntry f : flows){
-					log.info("Rule ID {}", f.id());
-					log.info("matched {} packets", f.packets());
-					log.info("matched {} bytes", f.bytes());
+					log.info("	Rule ID {}	matched {} packet, {} bytes", f.id(), f.packets(), f.bytes());
 				}
+				log.info("	--------------------");
 				try {
                     Thread.sleep((getDelay() * 1000));
                 } catch (InterruptedException e) {
@@ -106,14 +112,6 @@ public class portStatsReaderTask {
         this.portStats = portStats;
     }
 
-    public PortNumber getPort() {
-        return port;
-    }
-
-    public void setPort(PortNumber port) {
-        this.port = port;
-    }
-
     public DeviceService getDeviceService() {
         return deviceService;
     }
@@ -129,7 +127,7 @@ public class portStatsReaderTask {
 	public void setFlowRuleService(FlowRuleService flowRuleService){
 		this.flowRuleService = flowRuleService;
 	}
-
+	
     public Device getDevice() {
         return device;
     }
