@@ -26,6 +26,7 @@ sudo mn --topo tree,2,3 --mac --controller remote,ip=127.0.0.1 --switch ovsk,pro
 onos-*.*.*/bin/onos-service start
 ```
 * CLI
+
 [method1]
 ```
 ssh -p 8101 onos@<IP>
