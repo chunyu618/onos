@@ -1,4 +1,4 @@
-#### Useful Command
+## Useful Command
 * Register a new app 
 ```
 mvn archetype:generate -DarchetypeGroupId=org.onosproject -DarchetypeArtifactId=onos-bundle-archetype
@@ -11,7 +11,7 @@ mvn clean install
 ```
 onos-*.*.*/bin/onos-app install 127.0.0.1 *.oar
 ```
-#### Mininet
+## Mininet
 * Clean mininet
 ```
 sudo mn -c
@@ -20,19 +20,19 @@ sudo mn -c
 ```
 sudo mn --topo tree,2,3 --mac --controller remote,ip=127.0.0.1 --switch ovsk,protocol=OpenFlow13
 ```
-#### ONOS 
+## ONOS 
 * start ONOS
 ```
 onos-*.*.*/bin/onos-service start
 ```
 * CLI
 
-[method1]
+&emsp;[method1]
 ```
 ssh -p 8101 onos@<IP>
 #default username:onos password:rocks
 ```
-[method2]
+&emsp;[method2]
 ```
 onos-*.*.*/apache-karaf-*.*.*/bin/client
 ```
@@ -40,7 +40,7 @@ onos-*.*.*/apache-karaf-*.*.*/bin/client
 ```
 http://<IP>:8181/onos/ui/index.html
 ```
-#### Application control
+## Application control
 * Remember to start openflow
 ```
 onos> app activate org.onosproject.openflow
@@ -71,7 +71,7 @@ onos> flows
 onos> hosts
 onos> devices
 ```
-####Reference
+##Reference
 &emsp; https://hackmd.io/K78rZTC0ROiOxosEsAA1qw?view
 &emsp; https://github.com/benkajaja/ONOS-Apps/blob/master/MACLearning/src/main/java/jaja/AppComponent.java
 &emsp; https://github.com/YanHaoChen/Learning-SDN/tree/master/Controller/ONOS
