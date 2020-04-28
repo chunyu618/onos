@@ -55,9 +55,9 @@ public class portStatsReaderTask {
 				
 				Iterable<FlowEntry> flows = flowRuleService.getFlowEntries(getDevice().id());
 				for(FlowEntry f : flows){
-					log.info("	Rule ID {}	matched {} packet, {} bytes", f.id(), f.packets(), f.bytes());
+					log.info("	Rule ID {}, priority {}, matched {} packets, {} bytes\n				Selector(match) : {}\n\r				Treament(action) : {}", f.id(), f.priority(), f.packets(), f.bytes(), f.selector(), f.treatment());
+					log.info("	--------------------");
 				}
-				log.info("	--------------------");
 				try {
                     Thread.sleep((getDelay() * 1000));
                 } catch (InterruptedException e) {
