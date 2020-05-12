@@ -49,64 +49,65 @@ import java.util.List;
 @Component(immediate = true)
 public class AppComponent {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-    /** Some configurable property. */
-    // private String someProperty;
-    private ApplicationId appId;
-    private Map<Device,portStatsReaderTask> map = new HashMap<Device,portStatsReaderTask>();
+	/** Some configurable property. */
+	// private String someProperty;
+	private ApplicationId appId;
+	private Map<Device,PortStatsReaderTask> map = new HashMap<Device,PortStatsReaderTask>();
 
-    @Reference(cardinality = ReferenceCardinality.MANDATORY)
-    protected ComponentConfigService cfgService;
-    
-    @Reference(cardinality = ReferenceCardinality.MANDATORY)
-    protected CoreService coreService;
+	@Reference(cardinality = ReferenceCardinality.MANDATORY)
+	protected ComponentConfigService cfgService;
 
-    @Reference(cardinality = ReferenceCardinality.MANDATORY)
-    protected DeviceService deviceService;
+	@Reference(cardinality = ReferenceCardinality.MANDATORY)
+	protected CoreService coreService;
+
+	@Reference(cardinality = ReferenceCardinality.MANDATORY)
+	protected DeviceService deviceService;
 
 	@Reference(cardinality = ReferenceCardinality.MANDATORY)
 	protected FlowRuleService flowRuleService;
 
 	@Activate
-    protected void activate() {
-        // cfgService.registerProperties(getClass());
-        appId = coreService.registerApplication("org.jaja.portstats");
-        Iterable<Device> devices = deviceService.getDevices();
+	protected void activate() {
+		// cfgService.registerProperties(getClass());
+		appId = coreService.registerApplication("org.b06902048.PortState");
+		Iterable<Device> devices = deviceService.getDevices();
 
-        log.info("log name: {}", log.getName());
-        log.info("appid: {} {}", appId.id(), appId.name());
-        log.info("Hello");
-        System.out.println("test");
+		log.info("log name: {}", log.getName());
+		log.info("appid: {} {}", appId.id(), appId.name());
+		log.info("Hello");
 
-        for(Device d : devices)
-        {
-            log.info("[DeviceID] {}", d.id().toString());
+		for(Device d : devices){
+			//log.info("[DeviceID] {}", d.id().toString());
 
-            List<Port> ports = deviceService.getPorts(d.id());
-            for(Port port : ports) {
-                log.info("  [PortID] {}", port.number());
-                PortStatistics portstat = deviceService.getStatisticsForPort(d.id(), port.number());
-                PortStatistics portdeltastat = deviceService.getDeltaStatisticsForPort(d.id(), port.number());
-                if(portstat != null){
-                    log.info("    Recieved {} bytes", portstat.bytesReceived());
-                    log.info("    Recieved {} packets", portstat.packetsReceived());
-                } else
-                    log.warn("    Unable to read portStats");
+			/*
+			List<Port> ports = deviceService.getPorts(d.id());
+			for(Port port : ports) {
+				log.info("  [PortID] {}", port.number());
+				PortStatistics portstat = deviceService.getStatisticsForPort(d.id(), port.number());
+				PortStatistics portdeltastat = deviceService.getDeltaStatisticsForPort(d.id(), port.number());
+				if(portstat != null){
+					log.info("    Recieved {} bytes", portstat.bytesReceived());
+					log.info("    Recieved {} packets", portstat.packetsReceived());
+				} else
+					log.warn("    Unable to read portStats");
 
-                if(portdeltastat != null) {
-                    log.info("    Recieved {} bytes --Delta", portdeltastat.bytesReceived());
-                    log.info("    Recieved {} packets --Delta", portdeltastat.packetsReceived());
-                } else
-                    log.warn("    Unable to read portDeltaStats");
-            }
-            
+				if(portdeltastat != null) {
+					log.info("    Recieved {} bytes --Delta", portdeltastat.bytesReceived());
+					log.info("    Recieved {} packets --Delta", portdeltastat.packetsReceived());
+				} else
+					log.warn("    Unable to read portDeltaStats");
+			}
+			*/
+
 			try {
-				portStatsReaderTask task = new portStatsReaderTask();
-				task.setDelay(3);
+				PortStatsReaderTask task = new PortStatsReaderTask();
+				task.setDelay(1);
 				task.setExit(false);
 				task.setLog(log);
 				task.setDeviceService(deviceService);
+				task.setFlowRuleService(flowRuleService);
 				task.setDevice(d);
 				map.put(d, task);
 				log.info("[Start] polling {} {}", task.getDevice().id());
@@ -115,18 +116,18 @@ public class AppComponent {
 				e.printStackTrace();
 				log.error("exception!");
 			}
-        }
-    }
+		}
+	}
 
-    @Deactivate
-    protected void deactivate() {
-        cfgService.unregisterProperties(getClass(), false);
-        for(portStatsReaderTask task : map.values()) {
-            log.info("[Stop] polling {} {}", task.getDevice().id());
-            task.setExit(true);
-            task.getTimer().cancel();
-        }
-        log.info("Get Out");
-    }
+	@Deactivate
+	protected void deactivate() {
+		cfgService.unregisterProperties(getClass(), false);
+		for(PortStatsReaderTask task : map.values()) {
+			log.info("[Stop] polling {} {}", task.getDevice().id());
+			task.setExit(true);
+			task.getTimer().cancel();
+		}
+		log.info("Get Out");
+	}
 
 }

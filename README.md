@@ -9,7 +9,7 @@ mvn clean install
 ```
 * Install application 
 ```
-onos-*.*.*/bin/onos-app install 127.0.0.1 *.oar
+onos-*.*.*/bin/onos-app 127.0.0.1 install *.oar
 ```
 ## Mininet
 * Clean mininet

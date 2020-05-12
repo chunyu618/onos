@@ -9,6 +9,7 @@ import org.onosproject.net.flow.FlowEntry;
 import org.onosproject.net.flow.FlowRule;
 import org.onosproject.net.flow.FlowRuleExtPayLoad;
 import org.onosproject.net.PortNumber;
+import org.onosproject.net.Port;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.device.PortStatistics;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
 
-public class portStatsReaderTask {
+public class PortStatsReaderTask {
 
 	private long delay;
 	private Timer timer = new Timer();
@@ -25,8 +26,8 @@ public class portStatsReaderTask {
 	private Device device;
 	private boolean exit;
 	private PortStatistics portStats;
-	protected DeviceService deviceService = AbstractShellCommand.get(DeviceService.class);
-	protected FlowRuleService flowRuleService = AbstractShellCommand.get(FlowRuleService.class);
+	protected DeviceService deviceService;
+	protected FlowRuleService flowRuleService;
 	class Task extends TimerTask {
 		public Device getDevice() {
 			return device;
@@ -42,23 +43,31 @@ public class portStatsReaderTask {
 		public void run() {
 			while (!isExit()) {  
 				log.info("	[DeviceID] {}", getDevice().id());
-				log.info("	--------------------");
-				
-				List<PortStatistics> portStatisticsList = deviceService.getPortStatistics(getDevice().id());
-				for(PortStatistics portStat : portStatisticsList){
-					PortNumber port = portStat.portNumber();
-					log.info("	Port {}	received {} packets, {} bytes",   port, portStat.packetsReceived(), portStat.bytesReceived());
+				log.info("	----------Port Statistics----------");
+			
+				List<PortStatistics> deltaPortStatisticsList = deviceService.getPortDeltaStatistics(getDevice().id());
+				for(PortStatistics deltaPortStat : deltaPortStatisticsList){
+					PortNumber port = deltaPortStat.portNumber();
+					PortStatistics portStat = deviceService.getStatisticsForPort(getDevice().id(), port);
+					if(deltaPortStat.packetsReceived() > 0){
+						log.info("	DeviceID {}	Port {}	received {} packets, {} bytes in total",   getDevice().id(), port, portStat.packetsReceived(), portStat.bytesReceived());
+						log.info("	DeviceID {}	Port {}	received {} packets, {} bytes in last second",   getDevice().id(), port, deltaPortStat.packetsReceived(), deltaPortStat.bytesReceived());
+					}
 				}
+	
 
-				log.info("	--------------------");
+				/*
+				log.info("	----------Flow Statistics----------");
 				
 				Iterable<FlowEntry> flows = flowRuleService.getFlowEntries(getDevice().id());
 				for(FlowEntry f : flows){
-					log.info("	Rule ID {}, priority {}, matched {} packets, {} bytes\n				Selector(match) : {}\n\r				Treament(action) : {}", f.id(), f.priority(), f.packets(), f.bytes(), f.selector(), f.treatment());
-					log.info("	--------------------");
+					log.info("	Rule ID {}, priority {},\n				matched {} packets, {} bytes\n				Selector(match) : {}\n\r				Treament(action) : {}", f.id(), f.priority(), f.packets(), f.bytes(), f.selector(), f.treatment());
 				}
+				*/
+
 				try {
-					Thread.sleep((getDelay() * 1000));
+					// Sleeping for 1000 * dealy seconds.
+					Thread.sleep((getDelay() * 1000)); 
 				} catch (InterruptedException e) {
 					log.error("exception!");
 					e.printStackTrace();

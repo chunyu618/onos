@@ -85,14 +85,14 @@ public class AppComponent {
 	@Reference(cardinality = ReferenceCardinality.MANDATORY)
 	protected TopologyService topologyService;
 
-    @Activate
-    protected void activate() {
+	@Activate
+	protected void activate() {
 
 		//register app
 		appId = coreService.registerApplication("org.b06902048.app");
 
 		//Add a processor with priority 2
-        packetService.addProcessor(processor, PacketProcessor.director(2));
+		packetService.addProcessor(processor, PacketProcessor.director(2));
 		
 		//build a processing selector as default selector
 		TrafficSelector.Builder selector = DefaultTrafficSelector.builder();
@@ -104,14 +104,14 @@ public class AppComponent {
 		packetService.requestPackets(selector.build(), PacketPriority.REACTIVE, appId);
 		
 		log.info("Started");
-    }
+	}
 
-    @Deactivate
-    protected void deactivate() {
+	@Deactivate
+	protected void deactivate() {
 		//remove processor
 		packetService.removeProcessor(processor);
 		processor = null;
-        
+		
 		log.info("Stopped");
 	}
 

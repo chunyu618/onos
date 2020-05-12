@@ -65,7 +65,9 @@ public class AppComponent {
 	/** Some configurable property. */
 	// private String someProperty;
 	private ApplicationId appId;
+	// new a user defined processor.
 	private ReactivePacketProcessor processor = new ReactivePacketProcessor();
+	// create a map to store MAC address and port number, which is just like ARP table.
 	protected Map<DeviceId, Map<MacAddress, PortNumber>> macTables = Maps.newConcurrentMap();
 
 	@Reference(cardinality = ReferenceCardinality.MANDATORY)
@@ -86,14 +88,14 @@ public class AppComponent {
 	@Reference(cardinality = ReferenceCardinality.MANDATORY)
 	protected TopologyService topologyService;
 
-    @Activate
-    protected void activate() {
+	@Activate
+	protected void activate() {
 
 		//register app
 		appId = coreService.registerApplication("org.b06902048.app");
 
 		//Add a processor with priority 2
-        packetService.addProcessor(processor, PacketProcessor.director(2));
+		packetService.addProcessor(processor, PacketProcessor.director(2));
 		
 		//build a processing selector as default selector
 		TrafficSelector.Builder selector = DefaultTrafficSelector.builder();
@@ -105,18 +107,20 @@ public class AppComponent {
 		packetService.requestPackets(selector.build(), PacketPriority.REACTIVE, appId);
 		
 		log.info("Started");
-    }
+	}
 
-    @Deactivate
-    protected void deactivate() {
+	@Deactivate
+	protected void deactivate() {
 		//remove processor
 		packetService.removeProcessor(processor);
 		processor = null;
-        
+		
 		log.info("Stopped");
 	}
 
 	private class ReactivePacketProcessor implements PacketProcessor{
+		
+		// Need to implement process method.
 		@Override
 		public void process(PacketContext context){
 			//To check whether this packet was handled.
