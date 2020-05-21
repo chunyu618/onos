@@ -166,6 +166,10 @@ public class AppComponent {
 		
 		MacAddress src = ethPkt.getSourceMAC();
 		MacAddress dst = ethPkt.getDestinationMAC();
+		if(ethPkt.isBroadcast()){
+			log.info("[Broadcast]	from {} to {}, src, dst");
+			return;
+		}
 		log.info("[learning] from {} to {}", src, dst);
 		
 		if(src == null || dst == null){
@@ -174,12 +178,11 @@ public class AppComponent {
 		}
 
 		ConnectPoint device = pkt.receivedFrom();
-		log.info("[learning] Device {}", device);
 
 		Map<MacAddress, PortNumber> macTable = macTables.get(device.deviceId());
 		if(!macTable.containsKey(src)){
 			macTable.put(src, device.port());
-			log.info("[learning] learnd src {} maps port {}", src, device.port());
+			log.info("[learning] learned src {} maps port {}", src, device.port());
 		}
 	}
 
@@ -192,6 +195,7 @@ public class AppComponent {
 		MacAddress dst = ethPkt.getDestinationMAC();
 		PortNumber inPort = pkt.receivedFrom().port();
 
+
 		log.info("[forwarding] inPort {}, from {} to {}", inPort, src, dst);
 		
 		if(src == null || dst == null){
@@ -199,13 +203,23 @@ public class AppComponent {
 			return;
 		}
 		
+
+
 		ConnectPoint device = pkt.receivedFrom();
 		log.info("[forwarding] Device {}", device);
 
 		Map<MacAddress, PortNumber> macTable = macTables.get(device.deviceId());
 		PortNumber outPort = macTable.get(dst);
 		
-		if(outPort == null){
+		if(ethPkt.isBroadcast()){
+			if(!macTable.containsKey(src)){
+				macTable.put(src, device.port());
+				log.info("[learning] learned src {} maps port {}", src, device.port());
+			}
+			return;
+		}
+		
+		else if(outPort == null){
 			//no record, so flooding
 			packetOut(context, PortNumber.FLOOD);
 			log.info("[forwarding] Flooding");

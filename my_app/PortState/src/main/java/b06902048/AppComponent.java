@@ -26,9 +26,9 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
-
 import org.onosproject.net.Device;
 import org.onosproject.net.Port;
 import org.onosproject.net.PortNumber;
@@ -48,7 +48,7 @@ import java.util.List;
  */
 @Component(immediate = true)
 public class AppComponent {
-
+	private final int PROBETIME = 1;
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	/** Some configurable property. */
@@ -100,10 +100,9 @@ public class AppComponent {
 					log.warn("    Unable to read portDeltaStats");
 			}
 			*/
-
 			try {
 				PortStatsReaderTask task = new PortStatsReaderTask();
-				task.setDelay(1);
+				task.setDelay(5);
 				task.setExit(false);
 				task.setLog(log);
 				task.setDeviceService(deviceService);
@@ -117,6 +116,8 @@ public class AppComponent {
 				log.error("exception!");
 			}
 		}
+		log.info("Started");
+
 	}
 
 	@Deactivate
