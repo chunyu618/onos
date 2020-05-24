@@ -199,12 +199,6 @@ public class AppComponent {
 		MacAddress dst = ethPkt.getDestinationMAC();
 		PortNumber inPort = pkt.receivedFrom().port();
 		
-		//Match
-		selectorBuilder.matchEthDst(dst);
-		selectorBuilder.matchEthSrc(src);
-		selectorBuilder.matchInPort(inPort);
-
-		//Action
 		TrafficTreatment treatment;
 		
 		
@@ -227,7 +221,7 @@ public class AppComponent {
 				log.info("[forwarding]	different inPort {} and record port {}, drop the packet", inPort, macTable.get(src));
 			}
 			else{
-				//no record, so flooding
+				//no record or broadcast, so flooding
 				packetOut(context, PortNumber.FLOOD);
 				log.info("[forwarding]	No record outPort, flooding");
 				return;
@@ -256,6 +250,10 @@ public class AppComponent {
 		forwardingObjective.makeTemporary(20);
 		forwardingObjective.add();
 		*/
+		selectorBuilder.matchEthDst(dst);
+		selectorBuilder.matchEthSrc(src);
+		selectorBuilder.matchInPort(inPort);
+
 		ForwardingObjective forwardingObjective = DefaultForwardingObjective.builder()
 			.withSelector(selectorBuilder.build())
 			.withTreatment(treatment)
