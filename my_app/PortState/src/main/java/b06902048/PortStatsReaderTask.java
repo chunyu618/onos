@@ -42,17 +42,11 @@ public class PortStatsReaderTask {
 		@Override
 		public void run() {
 			while (!isExit()) {  
-				log.info("	[DeviceID] {}", getDevice().id());
-				log.info("	----------Port Statistics----------");
-			
 				List<PortStatistics> deltaPortStatisticsList = deviceService.getPortDeltaStatistics(getDevice().id());
 				for(PortStatistics deltaPortStat : deltaPortStatisticsList){
 					PortNumber port = deltaPortStat.portNumber();
 					PortStatistics portStat = deviceService.getStatisticsForPort(getDevice().id(), port);
-					if(deltaPortStat.packetsReceived() > 0){
-						log.info("	DeviceID {}	Port {}	received {} packets, {} bytes in total",   getDevice().id(), port, portStat.packetsReceived(), portStat.bytesReceived());
-						log.info("	DeviceID {}	Port {}	received {} packets, {} bytes in last second",   getDevice().id(), port, deltaPortStat.packetsReceived(), deltaPortStat.bytesReceived());
-					}
+					log.info("	DeviceID {}	Port {}	received {} packets, {} bytes in last 5 seconds",   getDevice().id(), port, deltaPortStat.packetsReceived(), deltaPortStat.bytesReceived());
 				}
 	
 
